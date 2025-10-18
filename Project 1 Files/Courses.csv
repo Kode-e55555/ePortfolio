@@ -1,0 +1,26 @@
+MATH202,Linear Algebra,MATH201
+MATH250,Probability and Statistics,MATH201
+CSCI220,Computer Organization,CSCI101
+CSCI230,Discrete Structures II,MATH201
+CSCI240,Assembly Language,CSCI220
+CSCI260,Computer Architecture,CSCI220
+CSCI320,Database Systems,CSCI200
+CSCI321,Advanced Database Systems,CSCI320
+CSCI330,Computer Networks,CSCI200
+CSCI331,Network Security,CSCI330
+CSCI340,Software Engineering,CSCI301
+CSCI360,Programming Languages,CSCI200
+CSCI370,Web Development,CSCI200
+CSCI371,Full-Stack Development,CSCI370,CSCI320
+CSCI380,Human-Computer Interaction,CSCI200
+CSCI390,Mobile App Development,CSCI301
+CSCI410,Machine Learning,CSCI300,MATH250,MATH202
+CSCI411,Artificial Intelligence,CSCI300
+CSCI420,Compilers,CSCI360,CSCI220
+CSCI430,Computer Graphics,CSCI301,MATH202
+CSCI440,Parallel and Distributed Systems,CSCI350
+CSCI450,Cybersecurity,CSCI330,CSCI301
+CSCI460,Cloud Computing,CSCI330,CSCI320
+CSCI470,Data Mining,CSCI320,MATH250
+CSCI480,Capstone I,CSCI400
+CSCI481,Capstone II,CSCI480

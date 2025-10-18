@@ -1,0 +1,299 @@
+//============================================================================
+// Name        : Project 2.cpp
+// Author      : Takoda Jennings
+// Version     : 1.0
+// Copyright   : Copyright © 2017 SNHU COCE
+// Description : Project 2 in C++
+//============================================================================
+
+#include <iostream>
+#include <vector>
+#include <fstream>
+
+#include "CSVparser.hpp"
+
+using namespace std; 
+
+//============================================================================
+// Global definitions visible to all methods and classes
+//============================================================================
+
+// structure to hold course information
+struct Course {
+	string courseNum;
+	string courseName;
+	vector<string> preReqs;
+
+	Course() {}
+};
+
+// structure for BST node
+struct Node {
+    Course course;
+    Node* left;
+    Node* right;
+
+    // default constructor
+    Node() {
+        left = nullptr;
+        right = nullptr;
+    }
+
+    // initialize with a course
+    Node(Course aCourse) :
+        Node() {
+        this->course = aCourse;
+    }
+};
+
+//============================================================================
+// Binary Search Tree class definition
+//============================================================================
+
+class CourseBST { 
+private:
+    Node* root;
+
+    void addNode(Node* node, Course course); 
+    void printSampleSchedule(Node* node);
+    void printCourseInformation(Node* node, string courseNum);
+
+public:
+    CourseBST();
+    virtual ~CourseBST();
+    void DeleteRecursive(Node* node);
+    void Insert(Course course);
+    int NumPrerequisiteCourses(Course course);
+    void PrintSampleSchedule();
+    void PrintCourseInformation(string courseNum);
+};
+
+// constructor to intiallize root
+CourseBST::CourseBST() {
+    root = nullptr;
+}
+
+// decontructor for BST
+CourseBST::~CourseBST() {
+    DeleteRecursive(root);
+}
+
+// method to delete node using deconstuctor
+void CourseBST::DeleteRecursive(Node* node) {
+    if (node) {
+        DeleteRecursive(node->left);
+        DeleteRecursive(node->right);
+        delete node;
+    }
+}
+
+// method to insert node into BST
+void CourseBST::Insert(Course course) {
+    // if root empty, add node as the root
+    if (root == nullptr) {
+        root = new Node(course);
+    }
+    // else, add to BST
+    else {
+        this->addNode(root, course);
+    }
+}
+
+// loop for counting and returning prerequisite courses
+int CourseBST::NumPrerequisiteCourses(Course course) {
+    int count = 0;
+        for (unsigned int i = 0; i < course.preReqs.size(); i++) {
+            if (course.preReqs.at(i).length() > 0) {
+                count++;
+            }
+        }
+    return count;
+}
+
+// pass root to PrintSampleSchedule method
+void CourseBST::PrintSampleSchedule() {
+    this->printSampleSchedule(root);
+}
+
+// pass root and course number to PrintCourseInformation method
+void CourseBST::PrintCourseInformation(string courseNum) {
+    this->printCourseInformation(root, courseNum);
+}
+
+// adds nodes based on if less than or greater than previous node
+void CourseBST::addNode(Node* node, Course course) {
+    // if current course's number is less than the current node's course number
+    if (node->course.courseNum.compare(course.courseNum) > 0) {
+        if (node->left == nullptr)
+            node->left = new Node(course);
+        else
+            this->addNode(node->left, course);
+    }
+    // else current course number is equal or greater than the current node's course number
+    else {
+        if (node->right == nullptr)
+            node->right = new Node(course);
+        else
+            this->addNode(node->right, course);
+    }
+}
+
+// using the passed root, print scheldule in alphabetical order 
+void CourseBST::printSampleSchedule(Node* node) {
+    if (node != nullptr) {
+        printSampleSchedule(node->left);
+        cout << node->course.courseNum << ", " << node->course.courseName << endl;
+        printSampleSchedule(node->right);
+    }
+    return;
+}
+
+// searches for a course and prints out current course and its prerequisite(s) else prints error 
+void CourseBST::printCourseInformation(Node* current, string courseNum) {
+    //Node* current = root;
+
+    while (current != nullptr) {
+        // if passed course number is equal to current course number, print course and look for prerequisite(s)
+        if (current->course.courseNum.compare(courseNum) == 0) {
+            cout << endl << current->course.courseNum << ", " << current->course.courseName << endl; 
+            unsigned int size = NumPrerequisiteCourses(current->course); 
+            cout << "Prerequisite(s): ";
+
+            // If prerequisite(s) exist, print prerequisite(s)
+            unsigned int i = 0; for (i = 0; i < size; i++) {
+                cout << current->course.preReqs.at(i);
+                if (i != size - 1) {
+                    cout << ", ";
+                }
+            }
+            return;
+        }
+        // else if smaller traverse left
+        else if (courseNum.compare(current->course.courseNum) < 0) {
+            current = current->left;
+        }
+        //else traverse right
+        else {
+            current = current->right;
+        }
+    }
+    // print statement if course not found
+    cout << "Course " << courseNum << " not found." << endl;
+}
+
+// Load courses using CSVparser
+void loadCourses(string csvPath, CourseBST* coursesBST) {
+    // open file and parse each line
+    try {
+        ifstream file(csvPath);
+
+        if (file.is_open()) {
+            while (!file.eof()) {
+                // vector to hold courses
+                vector<string> courseInfo;
+                string courseData;
+
+                getline(file, courseData);
+                while (courseData.length() > 0) {
+                    // get substring of each course data, add to vector & delete
+                    unsigned int comma = courseData.find(',');
+                    if (comma < 100) {
+                        courseInfo.push_back(courseData.substr(0, comma));
+                        courseData.erase(0, comma + 1);
+                    }
+                    // else add last course
+                    else {
+                        courseInfo.push_back(courseData.substr(0, courseData.length()));
+                        courseData = "";
+                    }
+                }
+                // load newly seperated valuses into course and insert into BST
+                Course course;
+                course.courseNum = courseInfo[0];
+                course.courseName = courseInfo[1];
+
+                for (unsigned int i = 2; i < courseInfo.size(); i++) {
+                    course.preReqs.push_back(courseInfo[i]);
+                }
+                coursesBST->Insert(course);
+            }
+            file.close();
+        }
+    }
+    catch (csv::Error& e) {
+        std::cerr << e.what() << std::endl;
+    }
+}
+
+/**
+ * The one and only main() method
+ */
+int main(int argc, char* argv[]) {
+
+    // process command line arguments
+    string csvPath, courseId;
+    switch (argc) {
+    case 2:
+        csvPath = argv[1];
+        break;
+    case 3:
+        csvPath = argv[1];
+        courseId = argv[2];
+        break;
+    default:
+        csvPath = "";
+        break;
+    }
+
+    // define a binary search tree and print welcome message
+    CourseBST* coursesBST = nullptr;
+    cout << "\nWelcome to the course planner!\n" << endl;
+
+    // display menu
+    int choice = 0;
+    while (choice != 9) {
+        cout << "Menu:" << endl;
+        cout << "  1. Load Data Stucture" << endl;
+        cout << "  2. Print Course List" << endl;
+        cout << "  3. Print course" << endl;
+        cout << "  9. Exit" << endl;
+        cout << "\nWhat would you like to do? ";
+        cin >> choice;
+
+        switch (choice) {
+        case 1:
+            if (coursesBST == nullptr) {
+                coursesBST = new CourseBST();
+            }
+            if (csvPath.length() == 0) {
+                cout << "Enter the file name that contains the course data: "; 
+                cin >> csvPath;
+            }
+            loadCourses(csvPath, coursesBST);
+            break;
+
+        case 2:
+            cout << "Here is a sample schedule:\n" << endl;
+            coursesBST->PrintSampleSchedule();
+            cout << endl;
+            break;
+
+        case 3:
+            cout << "What course do you want to know about? ";
+            cin >> courseId;
+            for (auto& choice : courseId) {
+                choice = toupper(choice);
+            }
+            coursesBST->PrintCourseInformation(courseId);
+            cout << endl;
+            break;
+
+        default:
+            if (choice != 9) {
+                cout << choice << " is not a valid option\n" << endl;
+            }
+            break;
+        }
+    }
+    cout << "\nThank you for using the course planner!" << endl;
+}
