@@ -3,8 +3,8 @@
 
 # Code Review
 - project: Code Review
-  url: "https://youtu.be/QB4pWzO4TVo"
-  description: Here you can find a YT Link to the Code Review of these Projects.
+  #url: "https://youtu.be/QB4pWzO4TVo"
+  description: "You can find a YT Link to the Code Review of these Projects [here](https://youtu.be/QB4pWzO4TVo)."
 
 # Liar's Dice Game
 - project: Liar's Dice Game
