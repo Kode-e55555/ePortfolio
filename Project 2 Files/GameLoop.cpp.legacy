@@ -1,0 +1,144 @@
+// Takoda Jennings, IT-312, 6/20/25, Final Project
+
+#include "gameLoop.h"
+#include <iostream>
+#include <fstream>
+#include <algorithm>
+
+// Display game rules from a text file
+void displayRulesFromFile(const std::string& filename) {
+    std::ifstream file(filename);
+    if (!file) {
+        std::cerr << "Error: Could not open rules file.\n";
+        return;
+    }
+
+    std::string line;
+    std::cout << "\n=== Liar's Dice Rules ===\n";
+    while (getline(file, line)) {
+        std::cout << line << std::endl;
+    }
+    std::cout << "=========================\n\n";
+}
+
+// Check if a bid is valid (must increase quantity or face)
+bool isValidBid(const Bid& newBid, const Bid& currentBid) {
+    if (newBid.quantity > currentBid.quantity) return true;
+    if (newBid.quantity == currentBid.quantity && newBid.face > currentBid.face) return true;
+    return false;
+}
+
+// Count all dice matching a given face
+int countMatchingDice(const std::vector<Player>& players, int face) {
+    int count = 0;
+    for (const auto& player : players) {
+        for (int die : player.getDice()) {
+            if (die == face) {
+                ++count;
+            }
+        }
+    }
+    return count;
+}
+
+// Set up players and roll dice
+void initializePlayers(std::vector<Player>& players, int numPlayers) {
+    for (int i = 0; i < numPlayers; ++i) {
+        Player player;
+        std::string name;
+        std::cout << "Enter name for Player " << (i + 1) << ": ";
+        std::cin >> name;
+        player.setName(name);
+        player.rollDice();
+        players.push_back(player);
+    }
+}
+
+// Main game loop
+void playGame(std::vector<Player>& players) {
+    Bid currentBid = {0, 0};
+    int currentPlayerIndex = 0;
+
+    while (true) {
+        Player& currentPlayer = players[currentPlayerIndex];
+        if (currentPlayer.isOut()) {
+            currentPlayerIndex = (currentPlayerIndex + 1) % players.size();
+            continue;
+        }
+
+        std::cout << "\n--- " << currentPlayer.getName() << "'s Turn ---\n";
+        currentPlayer.showDice();
+        std::cout << "Current bid: " << currentBid.quantity << " of face " << currentBid.face << "\n";
+
+        std::cout << "1. Make a bid\n2. Call liar\n> ";
+        int choice;
+        std::cin >> choice;
+
+        if (choice == 1) {
+            Bid newBid;
+            std::cout << "Enter quantity: ";
+            std::cin >> newBid.quantity;
+            std::cout << "Enter face (1–6): ";
+            std::cin >> newBid.face;
+
+            if (isValidBid(newBid, currentBid)) {
+                currentBid = newBid;
+                currentPlayerIndex = (currentPlayerIndex + 1) % players.size();
+            } else {
+                std::cout << "Invalid bid. Try again.\n";
+            }
+        } else if (choice == 2) {
+            int prevIndex = (currentPlayerIndex - 1 + players.size()) % players.size();
+            Player& prevPlayer = players[prevIndex];
+
+            std::cout << "\nRevealing all dice:\n";
+            for (const auto& player : players) {
+                if (!player.isOut()) {
+                    player.showDice();
+                }
+            }
+
+            int actualCount = countMatchingDice(players, currentBid.face);
+            std::cout << "Actual number of " << currentBid.face << "s: " << actualCount << "\n";
+
+            if (actualCount >= currentBid.quantity) {
+                std::cout << currentPlayer.getName() << " was wrong! Loses a die.\n";
+                currentPlayer.removeDie();
+                if (currentPlayer.isOut()) {
+                    currentPlayer.setActive(false);
+                    std::cout << currentPlayer.getName() << " is out of the game!\n";
+                }
+            } else {
+                std::cout << prevPlayer.getName() << " was lying! Loses a die.\n";
+                prevPlayer.removeDie();
+                if (prevPlayer.isOut()) {
+                    prevPlayer.setActive(false);
+                    std::cout << prevPlayer.getName() << " is out of the game!\n";
+                }
+            }
+
+            currentBid = {0, 0};
+            for (auto& player : players) {
+                if (!player.isOut()) {
+                    player.rollDice();
+                }
+            }
+
+            currentPlayerIndex = (currentPlayerIndex + 1) % players.size();
+
+            int activeCount = 0;
+            std::string winner;
+            for (const auto& player : players) {
+                if (!player.isOut()) {
+                    activeCount++;
+                    winner = player.getName();
+                }
+            }
+
+            if (activeCount == 1) {
+                std::cout << "\n=== " << winner << " wins the game! ===\n";
+                break;
+            }
+        }
+    }
+}

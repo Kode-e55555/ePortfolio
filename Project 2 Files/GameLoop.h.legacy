@@ -1,0 +1,22 @@
+// Takoda Jennings, IT-312, 6/20/25, Final Project
+
+#ifndef GAMELOOP_H
+#define GAMELOOP_H
+
+#include "player.h"
+#include <vector>
+#include <string>
+
+// Struct to represent a player's bid (e.g., "4 of face 3")
+struct Bid {
+    int quantity;
+    int face;
+};
+
+void displayRulesFromFile(const std::string& filename);
+bool isValidBid(const Bid& newBid, const Bid& currentBid);
+int countMatchingDice(const std::vector<Player>& players, int face);
+void initializePlayers(std::vector<Player>& players, int numPlayers);
+void playGame(std::vector<Player>& players);
+
+#endif

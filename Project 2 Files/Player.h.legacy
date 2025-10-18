@@ -1,0 +1,30 @@
+// Takoda Jennings, CS-499, 9/18/25
+
+#ifndef PLAYER_H
+#define PLAYER_H
+
+#include <string>
+#include <vector>
+
+// This is the player class that manages a player's name, dice, and active game status
+class Player {
+private:
+    std::string name;
+    int diceCount;
+    std::vector<int> dice;
+    bool active;
+
+public:
+    Player();
+    void setName(const std::string& playerName);
+    std::string getName() const;
+    void rollDice();
+    void showDice() const;
+    void removeDie();
+    bool isOut() const;
+    const std::vector<int>& getDice() const;
+    bool isActive() const;
+    void setActive(bool state);
+};
+
+#endif

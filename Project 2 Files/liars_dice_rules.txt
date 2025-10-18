@@ -1,0 +1,15 @@
+Liar's Dice Rules
+
+1. Liar's Dice is a multiplayer game with a minimum of two players.
+2. Each player has five dice. All dice are rolled once at the start of the game.
+3. On a turn, a player makes a guess about how many dice of a certain number exist among all players.
+   Example: 'two fives' means the player believes there are at least two dice showing five.
+4. Bluffing is allowed. Players can call 'liar' if they think the last guess is incorrect.
+5. If 'liar' is called, all dice are revealed:
+   - If the guess was correct, the guesser wins.
+   - If the guess was wrong, the person who called 'liar' wins.
+6. If the guess is not challenged, the next player must increase the bid:
+   - The quantity must be higher than the previous guess.
+   - Examples: from 'two fives' to 'three fives' or 'three fours'.
+   - Invalid follow-ups: 'one five' or 'two ones'.
+7. Gameplay continues until a 'liar' is called.

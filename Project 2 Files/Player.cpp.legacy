@@ -1,0 +1,62 @@
+// Takoda Jennings, CS-499, 9/18/25
+
+#include "player.h"
+#include <iostream>
+#include <cstdlib>
+
+// Constructor initializes default values
+Player::Player() : name("Unknown"), diceCount(5), active(true) {}
+
+// Sets the player's name
+void Player::setName(const std::string& playerName) {
+    name = playerName;
+}
+
+// Returns the player's name
+std::string Player::getName() const {
+    return name;
+}
+
+// Rolls the player's dice based on their current dice count
+void Player::rollDice() {
+    dice.clear();
+    for (int i = 0; i < diceCount; ++i) {
+        dice.push_back((rand() % 6) + 1);
+    }
+}
+
+// Displays the player's dice to the console
+void Player::showDice() const {
+    std::cout << name << "'s dice: ";
+    for (int die : dice) {
+        std::cout << die << " ";
+    }
+    std::cout << std::endl;
+}
+
+// Removes one die from the player and updates count
+void Player::removeDie() {
+    if (diceCount > 0) {
+        --diceCount;
+    }
+}
+
+// Returns true if the player has no dice left
+bool Player::isOut() const {
+    return diceCount == 0;
+}
+
+// Returns the player's current dice
+const std::vector<int>& Player::getDice() const {
+    return dice;
+}
+
+// Checks if the player is still in the game
+bool Player::isActive() const {
+    return active;
+}
+
+// Sets whether the player is still active
+void Player::setActive(bool state) {
+    active = state;
+}
